@@ -1,6 +1,8 @@
 *{margin: 0; padding: 0;}
-
+body{
+	background: #474747;
+}
 canvas{
-	background: #efefef;
-	border: #000 solid 2px;
+	background: #000000;
+	border: #008BDB solid 15px;
 }
