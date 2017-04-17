@@ -9,13 +9,14 @@ var ship_y = new Array(710, 780, 770, 755, 750, 780, 780, 785, 785, 780, 780, 75
 
 var monster = new Array(190, 100, 205, 80, 220, 80, 235, 100, 230, 105, 195, 105, 190, 100);
 
-function ship(dx, dy) {
-		this.dx = 0;
+function ship() {
+		this.dx = 190;
     	this.dy = 0;
     	this.health = 100;
     	this.draw = function(x, y, c, cc) {
     		var i = 0;
 			var l = ship_x.length;
+			context.clearRect(0,0,window.innerWidth,window.innerHeight);
 			context.fillStyle = c;
 			context.strokeStyle = cc;
 			context.beginPath();
@@ -31,18 +32,28 @@ function ship(dx, dy) {
     	}
 }
 
-k = new ship(0, 0);
+k = new ship();
 k.draw(ship_x, ship_y, "#21375F", "#FFB200");
+
+u = ship_x.length;
 
 onkeypress = function() {
 		if(event.keyCode == 100) {//right
-			if(k.dx < 600) {
+			if(k.dx < 500) {
 				k.dx += 35;
+				for (var t = 0; t < u; ++t) {
+					ship_x[t] += 35;
+				}
+				k.draw(ship_x, ship_y, "#21375F", "#FFB200");
 			}
 		}
 		if(event.keyCode == 97) {//left
-			if(k.dx > 600) {
+			if(k.dx > 35) {
 				k.dx-=35;
+				for (t = 0; t < u; ++t) {
+					ship_x[t] -= 35;
+				}
+				k.draw(ship_x, ship_y, "#21375F", "#FFB200");
 			}
 		}
 		k.draw(ship_x, ship_y, "#21375F", "#FFB200");
@@ -51,6 +62,6 @@ onkeypress = function() {
 setInterval(function() {
 }, 50);
 
-function Clear(dx, dy) {
+/*function Clear(dx, dy) {
   context.clearRect(0,0,window.innerWidth,window.innerHeight);
-}
+}*/
