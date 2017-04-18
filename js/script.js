@@ -21,7 +21,7 @@ function ship() {
 			context.strokeStyle = cc;
 			context.beginPath();
 			context.moveTo(x[i], y[i]);
-			i = 2;
+			i = 1;
 			while (i < l) {
 				context.lineTo(x[i] , y[i]);
 				i = i + 1;
