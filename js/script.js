@@ -9,8 +9,10 @@ var ship_y = new Array(710, 780, 770, 755, 750, 780, 780, 785, 785, 780, 780, 75
 
 var monster = new Array(190, 100, 205, 80, 220, 80, 235, 100, 230, 105, 195, 105, 190, 100);
 
+var bullet = new Array(225, 686, 225, 660);
+
 function ship() {
-		this.dx = 190;
+    	this.dx = 190;
     	this.dy = 0;
     	this.health = 100;
     	this.draw = function(x, y, c, cc) {
@@ -19,6 +21,7 @@ function ship() {
 			context.clearRect(0,0,window.innerWidth,window.innerHeight);
 			context.fillStyle = c;
 			context.strokeStyle = cc;
+			context.lineWidth = 2;
 			context.beginPath();
 			context.moveTo(x[i], y[i]);
 			i = 1;
@@ -32,7 +35,50 @@ function ship() {
     	}
 }
 
+function bullets() {
+		this.draw = function(po, c, cc){
+			var i = 0;
+			var l = po.length;
+			context.fillStyle = c;
+			context.strokeStyle = cc;
+			context.lineWidth = 3;
+			context.beginPath();
+			context.moveTo(po[i], po[i + 1]);
+			i = 2;
+			while (i < l) {
+				context.lineTo(po[i] , po[i + 1]);
+				i = i + 2;
+			}
+			context.closePath();
+			context.fill();
+			context.stroke();
+		}
+}
+
+function monsters() {
+		this.health = 100;
+		this.draw = function(po, c, cc){
+			var i = 0;
+			var l = po.length;
+			context.fillStyle = c;
+			context.strokeStyle = cc;
+			context.lineWidth = 3;
+			context.beginPath();
+			context.moveTo(po[i], po[i + 1]);
+			i = 2;
+			while (i < l) {
+				context.lineTo(po[i] , po[i + 1]);
+				i = i + 2;
+			}
+			context.closePath();
+			context.fill();
+			context.stroke();
+		}
+}
+
 k = new ship();
+b = new bullets();
+m = new monsters();
 k.draw(ship_x, ship_y, "#21375F", "#FFB200");
 
 u = ship_x.length;
@@ -60,6 +106,8 @@ onkeypress = function() {
 }
 
 setInterval(function() {
+	b.draw(bullet, "#B80F0F", "#B80F0F");
+	m.draw(monster, "#00036B", "#960EB9");
 }, 50);
 
 /*function Clear(dx, dy) {
