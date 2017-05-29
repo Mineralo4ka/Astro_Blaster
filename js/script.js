@@ -11,6 +11,10 @@ var ship_y = new Array(710, 780, 770, 755, 750, 780, 780, 785, 785, 780, 780, 75
 
 //var bullet = new Array(225, 686, 225, 660);
 
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
 function ship() {
     this.dx = 190;
     this.dy = 0;
@@ -40,18 +44,18 @@ function ship() {
 
 function bullets() {
 	this.bullet = new Array(225, 686, 225, 660);
-	
+	this.l = this.bullet.length;
+
 	if(typeof this.draw != "function") {
 		bullets.prototype.draw = function(po, c, cc){
 			var i = 0;
-			var l = po.length;
 			context.fillStyle = c;
 			context.strokeStyle = cc;
 			context.lineWidth = 3;
 			context.beginPath();
 			context.moveTo(po[i], po[i + 1]);
 			i = 2;
-			while (i < l) {
+			while (i < this.l) {
 				context.lineTo(po[i] , po[i + 1]);
 				i = i + 2;
 			}
@@ -66,7 +70,13 @@ function bullets() {
 			context.clearRect(p[2] - 2, p[3], 5, 27);
 			p[1] -= 10;
 			p[3] -= 10;
-			this.draw(p, "#B80F0F", "#B80F0F")
+			this.draw(p, "#B80F0F", "#B80F0F");
+		}
+	}
+
+	if(typeof this.clear_bullet != "function") {
+		bullets.prototype.clear_bullet = function (p){
+			context.clearRect(p[2] - 2, p[3], 5, 27);
 		}
 	}
 }
@@ -75,8 +85,8 @@ function monsters() {
 	this.health = 100;
 	this.monster = new Array(190, 100, 205, 80, 220, 80, 235, 100, 230, 105, 195, 105, 190, 100);
 	this.l = this.monster.length;
-	this.x = 1; 
-	this.y = 1;
+	this.x = getRandomInt(-3, 4); 
+	this.y = getRandomInt(-3, 4);
 	
 	if(typeof this.draw != "function") {
 		monsters.prototype.draw = function(po, c, cc){
@@ -99,27 +109,30 @@ function monsters() {
 
 	if(typeof this.move_monster != "function") { 
 		monsters.prototype.move_monster = function (p) {
-			context.clearRect(p[0], p[1] - 20, 45, 25);
+			var j = 0;
+			context.clearRect(p[0] - 2, p[3] - 2, 49, 29);
 			if (p[0] < 0 || p[6] > 600) {
 				this.x *= -1;
+				//this.y *= -1;
 			}
 
-			if (p[3] < 0 || p[9] > 800) {
+			if (p[3] < 0 || p[9] > 680) {
 				this.y *= -1;
 			}
 
-			for (var j = 0; j < this.l; j++) {
-				p[j] += 10 * this.x;
-				p[j + 1] += 10 * this.y;
+			while (j < this.l) {
+				p[j] += (1 * this.x);
+				p[j + 1] += (1 * this.y);
+				j += 2;
 			}
-
+			//j = 0;
 			this.draw(p, "#00036B", "#960EB9");
 		}
 	}
 
 	if(typeof this.kill_monster != "function") {
 		monsters.prototype.kill_monster = function (p) {
-			context.clearRect(p[0], p[1] - 20, 45, 25);
+			context.clearRect(p[0] - 2, p[3] - 2, 49, 29);
 		}
 	}
 }
@@ -129,7 +142,7 @@ var b = new Array ();
 var m = new Array ();
 k.draw(ship_x, ship_y, "#21375F", "#FFB200");
 
-var b_l, b_2;
+var b_1, b_2;
 var m_1, m_2;
 u = ship_x.length;
 
@@ -160,60 +173,59 @@ onkeypress = function() {
 	}
 }
 
-/*function creat_monsters()
-{
-	var i = m.length;
-	//if (i < 5) {
-		while (i != 5) {
-			m.unshift(new monsters());
+setInterval(function () {
+	if (m.length < 10) {
+		m.push(new monsters());
+	}
+}, 2000);
+
+setInterval(function () {
+	var i = 0;
+	m_1 = m.length - 1;
+		while (i <= m_1) {
+			m[i].move_monster(m[i].monster);
 			i++;
 		}
-	//}
-}*/
-
-/*setTimeout(function () {
-	m.push(new monsters());
-	m[0].draw(m[0].monster, "#00036B", "#960EB9");
-}, 2000);*/
+	i = 0;
+},50);
 
 setInterval(function() {
-	b_l = b.length - 1;
-	while (b_l != -1) {
-		if (b[b_l].bullet[3] < 800){
-			b[b_l].move_bullet(b[b_l].bullet);
-		} else {
-			 b.splice(b_l, 1);
+	b_1 = b.length - 1;
+	while (b_1 != -1) {
+		if (b[b_1].bullet[3] > 0){
+			b[b_1].move_bullet(b[b_1].bullet);
 		}
-		b_l--;
+		if (b[b_1].bullet[3] == 0) {
+			//context.clearRect(0, 0, 600, 27);
+			b[b_1].clear_bullet(b[b_1].bullet);
+		}
+		b_1--;
 	}
+	b_1 = 0;
 }, 50);
 
-/*setInterval(function () {
-	b_2 = b.length;
-	m_2 = m.length;
-	var y_b, y_m;
+setInterval(function () {
+	b_2 = b.length - 1;
+	m_2 = m.length - 1;
+
 	while (b_2 != -1) {
-		y_b = b[b_2].bullet[3];
 		while (m_2 != -1) {
-			y_m = m[m_2].monster[9];
-			if (y_m == y_b) {
-				m[m_2].kill_monster(m[m_2].monster);
-				m.splice(m_2, 1)
+			if (b[b_2].bullet[3] >= m[m_2].monster[9] && b[b_2].bullet[3] <= m[m_2].monster[9] + 27) {
+				if (b[b_2].bullet[0] >= m[m_2].monster[0] && b[b_2].bullet[0] <= m[m_2].monster[6]) {
+					m[m_2].kill_monster(m[m_2].monster);
+					b[b_2].clear_bullet(b[b_2].bullet);
+					/*m[m_2] = [];
+					b[b_2] = [];*/
+					m.splice(m_2, 1);
+					b.splice(b_2, 1);
+				}
 			}
 			m_2--;
 		}
+		m_2 = m.length - 1;
 		b_2--;
 	}
-}, 50);*/
-
-/*setInterval(function () {
-	//creat_monsters();
-	m_1 = m.length;
-	while (m_1 != -1){
-		m[m_1].move_monster(m[m_1].monster);
-		m_1--;
-	}
-}, 100);*/
+}, 50);
 
 /*function Clear(dx, dy) {
   context.clearRect(0,0,window.innerWidth,window.innerHeight);
