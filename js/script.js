@@ -10,6 +10,7 @@ var ship_y = new Array(710, 780, 770, 755, 750, 780, 780, 785, 785, 780, 780, 75
 //var monster = new Array(190, 100, 205, 80, 220, 80, 235, 100, 230, 105, 195, 105, 190, 100);
 
 //var bullet = new Array(225, 686, 225, 660);
+var status = "menu", counter = 0, score = 0, fail = 0;
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
@@ -81,6 +82,18 @@ function bullets() {
 	}
 }
 
+function menu() {
+	context.beginPath();
+    context.fillStyle = "blue";
+    context.rect(window.innerWidth / 9 - 100, window.innerHeight / 2 - 120 ,400,100);
+    context.fill();
+    context.beginPath();
+    context.fillStyle = "white";
+    context.font = "70px Calibri";
+    context.fillText("Play", window.innerWidth / 7 - 20,  window.innerHeight / 3 + 110);
+    context.fill();
+}
+
 function monsters() {
 	this.health = 100;
 	this.monster = new Array(190, 100, 205, 80, 220, 80, 235, 100, 230, 105, 195, 105, 190, 100);
@@ -116,8 +129,9 @@ function monsters() {
 				//this.y *= -1;
 			}
 
-			if (p[3] < 0 || p[9] > 680) {
+			if (p[3] < 0 || p[9] > 690) {
 				this.y *= -1;
+				fail++;
 			}
 
 			while (j < this.l) {
@@ -218,6 +232,7 @@ setInterval(function () {
 					b[b_2] = [];*/
 					m.splice(m_2, 1);
 					b.splice(b_2, 1);
+					score++;
 				}
 			}
 			m_2--;
@@ -227,6 +242,28 @@ setInterval(function () {
 	}
 }, 50);
 
-/*function Clear(dx, dy) {
+setInterval(function () { 
+	if (status == "win") {
+		status = "lose";
+	} else if(fail >= 3){
+      status = "lose";
+    }
+    if(status == "lose"){
+    Clear();
+    menu();
+    context.fillStyle = "white";
+    context.font = "30px Calibri";
+    context.fillText("Game over!", window.innerWidth / 6 - 70, window.innerHeight / 2 - 130);
+    context.fill();
+    context.beginPath();
+    context.fillStyle = "white";
+    context.font = "30px Calibri";
+    context.fillText("Score - " + score,  window.innerWidth / 6 - 55 , window.innerHeight / 2 + 15);
+    context.fill();
+    //menu();
+  }
+}, 50);
+
+function Clear(dx, dy) {
   context.clearRect(0,0,window.innerWidth,window.innerHeight);
-}*/
+}
