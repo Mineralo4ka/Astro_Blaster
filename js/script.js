@@ -7,10 +7,17 @@ var ship_x = new Array(190, 190, 200, 200, 210, 210, 220, 220, 230, 230, 240, 24
 
 var ship_y = new Array(710, 780, 770, 755, 750, 780, 780, 785, 785, 780, 780, 750, 755, 770, 780, 710, 710, 740, 730, 710, 690, 690, 710, 730, 740, 710, 710);
 
-//var monster = new Array(190, 100, 205, 80, 220, 80, 235, 100, 230, 105, 195, 105, 190, 100);
+var status = "menu", status_fire = "fire", counter = 0, score = 0, fail = 0, overload = 0;
 
-//var bullet = new Array(225, 686, 225, 660);
-var status = "menu", counter = 0, score = 0, fail = 0;
+var k = new ship();
+
+window.onload = function() {
+    menu();
+    canvas.onmousedown = canvasClick;
+    if (status == "play") {
+    	k.draw(ship_x, ship_y, "#21375F", "#FFB200");
+    }
+}
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
@@ -78,20 +85,9 @@ function bullets() {
 	if(typeof this.clear_bullet != "function") {
 		bullets.prototype.clear_bullet = function (p){
 			context.clearRect(p[2] - 2, p[3], 5, 27);
+			//context.clearRect(0, 0, 600, 27);
 		}
 	}
-}
-
-function menu() {
-	context.beginPath();
-    context.fillStyle = "blue";
-    context.rect(window.innerWidth / 9 - 100, window.innerHeight / 2 - 120 ,400,100);
-    context.fill();
-    context.beginPath();
-    context.fillStyle = "white";
-    context.font = "70px Calibri";
-    context.fillText("Play", window.innerWidth / 7 - 20,  window.innerHeight / 3 + 110);
-    context.fill();
 }
 
 function monsters() {
@@ -129,16 +125,20 @@ function monsters() {
 				//this.y *= -1;
 			}
 
-			if (p[3] < 0 || p[9] > 690) {
+			if (p[3] < 27 || p[9] > 680) {
 				this.y *= -1;
-				fail++;
 			}
 
+			if (p[9] > 680) {
+				fail++;
+			}
+			
 			while (j < this.l) {
 				p[j] += (1 * this.x);
 				p[j + 1] += (1 * this.y);
 				j += 2;
 			}
+
 			//j = 0;
 			this.draw(p, "#00036B", "#960EB9");
 		}
@@ -151,94 +151,155 @@ function monsters() {
 	}
 }
 
-var k = new ship();
+function menu() {
+	context.beginPath();
+    context.fillStyle = "blue";
+    context.rect(window.innerWidth / 9 - 40, window.innerHeight / 2 - 120,400,100);
+    context.fill();
+    context.beginPath();
+    context.fillStyle = "white";
+    context.font = "70px Calibri";
+    context.fillText("Play", window.innerWidth / 7 + 55,  window.innerHeight / 3 + 110);
+    context.fill();
+}
+
+function clear_menu() {
+	context.clearRect(window.innerWidth / 9 - 40, window.innerHeight / 2 - 200,410,300)
+}
+
 var b = new Array ();
 var m = new Array ();
-k.draw(ship_x, ship_y, "#21375F", "#FFB200");
 
 var b_1, b_2;
 var m_1, m_2;
 u = ship_x.length;
 
 onkeypress = function() {
-	if(event.keyCode == 100 || event.keyCode == 1074) {//right
-		if(k.dx < 500) {
-			k.dx += 10;
-			for (var t = 0; t < u; ++t) {
-				ship_x[t] += 10;
+	if (status == "play") {
+		if(event.keyCode == 100 || event.keyCode == 1074) {//right
+			if(k.dx < 500) {
+				k.dx += 10;
+				for (var t = 0; t < u; ++t) {
+					ship_x[t] += 10;
+				}
+				k.draw(ship_x, ship_y, "#21375F", "#FFB200");
 			}
-			k.draw(ship_x, ship_y, "#21375F", "#FFB200");
 		}
-	}
-	if(event.keyCode == 97 || event.keyCode == 1092) {//left
-		if(k.dx > 35) {
-			k.dx -= 10;
-			for (t = 0; t < u; ++t) {
-				ship_x[t] -= 10;
+		if(event.keyCode == 97 || event.keyCode == 1092) {//left
+			if(k.dx > 35) {
+				k.dx -= 10;
+				for (t = 0; t < u; ++t) {
+					ship_x[t] -= 10;
+				}
+				k.draw(ship_x, ship_y, "#21375F", "#FFB200");
 			}
-			k.draw(ship_x, ship_y, "#21375F", "#FFB200");
 		}
-	}
+		
+		if (status_fire = "fire" && overload < 10) {
+			if (event.keyCode == 32) {
+				b.unshift(new bullets());
+				b[0].bullet[0] = ship_x[6] + 5;
+				b[0].bullet[2] = ship_x[6] + 5;
+				/*if (overload == 10) {
+					status_fire = "no_fire";
+				}*/
+			}
 
-	if (event.keyCode == 32) {
-		b.unshift(new bullets());
-		b[0].bullet[0] = ship_x[6] + 5;
-		b[0].bullet[2] = ship_x[6] + 5;
+			if (status_fire = "fire" && overload < 10) {
+				overload++;
+			}
+
+			if (overload == 10) {
+				status_fire = "no_fire";
+			} 
+		}
 	}
 }
 
+function canvasClick(event) {
+	var clickX = event.pageX - canvas.offsetLeft;
+    var clickY = event.pageY - canvas.offsetTop;
+
+    if (clickX >= window.innerWidth / 9 - 40 && clickX <= 400) {
+    	if (clickY >= window.innerHeight / 2 - 120 && clickY <= window.innerHeight / 2 - 20) {
+    		status = "play";
+    		clear_menu();
+    	}
+    }
+}
+
 setInterval(function () {
-	if (m.length < 10) {
-		m.push(new monsters());
+	if (status_fire == "no_fire") {
+		overload--;
+
+		if (overload == 0) {
+			status_fire = "fire";
+			alert(status_fire);
+		}
+	}
+
+},500);
+
+setInterval(function () {
+	if (status == "play") {
+		if (m.length < 10) {
+			m.push(new monsters());
+		}
 	}
 }, 2000);
 
 setInterval(function () {
-	var i = 0;
-	m_1 = m.length - 1;
-		while (i <= m_1) {
-			m[i].move_monster(m[i].monster);
-			i++;
-		}
-	i = 0;
+	if (status == "play") {
+		var i = 0;
+		m_1 = m.length - 1;
+			while (i <= m_1) {
+				m[i].move_monster(m[i].monster);
+				i++;
+			}
+		i = 0;
+	}
 },50);
 
 setInterval(function() {
-	b_1 = b.length - 1;
-	while (b_1 != -1) {
-		if (b[b_1].bullet[3] > 0){
-			b[b_1].move_bullet(b[b_1].bullet);
+	if (status == "play") {
+		b_1 = b.length - 1;
+		while (b_1 != -1) {
+			if (b[b_1].bullet[3] > 0){
+				b[b_1].move_bullet(b[b_1].bullet);
+			}
+			if (b[b_1].bullet[3] == 0) {
+				context.clearRect(0, 0, 600, 27);
+				//b[b_1].clear_bullet(b[b_1].bullet);
+			}
+			b_1--;
 		}
-		if (b[b_1].bullet[3] == 0) {
-			//context.clearRect(0, 0, 600, 27);
-			b[b_1].clear_bullet(b[b_1].bullet);
-		}
-		b_1--;
+		b_1 = 0;
 	}
-	b_1 = 0;
 }, 50);
 
 setInterval(function () {
-	b_2 = b.length - 1;
-	m_2 = m.length - 1;
-
-	while (b_2 != -1) {
-		while (m_2 != -1) {
-			if (b[b_2].bullet[3] >= m[m_2].monster[9] && b[b_2].bullet[3] <= m[m_2].monster[9] + 27) {
-				if (b[b_2].bullet[0] >= m[m_2].monster[0] && b[b_2].bullet[0] <= m[m_2].monster[6]) {
-					m[m_2].kill_monster(m[m_2].monster);
-					b[b_2].clear_bullet(b[b_2].bullet);
-					/*m[m_2] = [];
-					b[b_2] = [];*/
-					m.splice(m_2, 1);
-					b.splice(b_2, 1);
-					score++;
-				}
-			}
-			m_2--;
-		}
+	if (status == "play") {
+		b_2 = b.length - 1;
 		m_2 = m.length - 1;
-		b_2--;
+
+		while (b_2 != -1) {
+			while (m_2 != -1) {
+				if (b[b_2].bullet[3] >= m[m_2].monster[9] && b[b_2].bullet[3] <= m[m_2].monster[9] + 27) {
+					if (b[b_2].bullet[0] >= m[m_2].monster[0] && b[b_2].bullet[0] <= m[m_2].monster[6]) {
+						m[m_2].kill_monster(m[m_2].monster);
+						b[b_2].clear_bullet(b[b_2].bullet);
+						/*m[m_2] = [];
+						b[b_2] = [];*/
+						m.splice(m_2, 1);
+						b.splice(b_2, 1);
+						score++;
+					}
+				}
+				m_2--;
+			}
+			m_2 = m.length - 1;
+			b_2--;
+		}
 	}
 }, 50);
 
@@ -253,17 +314,17 @@ setInterval(function () {
     menu();
     context.fillStyle = "white";
     context.font = "30px Calibri";
-    context.fillText("Game over!", window.innerWidth / 6 - 70, window.innerHeight / 2 - 130);
+    context.fillText("Game over!", window.innerWidth / 6 + 20, window.innerHeight / 2 - 130);
     context.fill();
     context.beginPath();
     context.fillStyle = "white";
     context.font = "30px Calibri";
-    context.fillText("Score - " + score,  window.innerWidth / 6 - 55 , window.innerHeight / 2 + 15);
+    context.fillText("Score - " + score,  window.innerWidth / 6 + 35, window.innerHeight / 2 + 15);
     context.fill();
     //menu();
   }
 }, 50);
 
-function Clear(dx, dy) {
+function Clear() {
   context.clearRect(0,0,window.innerWidth,window.innerHeight);
 }
